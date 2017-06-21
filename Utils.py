@@ -17,6 +17,17 @@ class Op(object):
 
         return binascii.hexlify(xor)
 
+    @staticmethod
+    def repeating_xor(plaintext, key_string):
+        get_chunk = lambda x,y: [ x[i:i+y] for i in range(0, len(x) ,y) ]
+
+        xor_hex = ""
+
+        for chunk in get_chunk(plaintext, len(key_string)):
+            xor_hex += Op.xor(binascii.hexlify(chunk), binascii.hexlify(key_string))
+
+        return xor_hex
+
 if __name__ == "__main__":
     print "This is a module."
 

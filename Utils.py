@@ -31,14 +31,16 @@ class Op(object):
 
     @staticmethod
     def repeating_xor(plaintext, key_string):
-        get_chunk = lambda x,y: [ x[i:i+y] for i in range(0, len(x) ,y) ]
-
         xor_hex = ""
 
-        for chunk in get_chunk(plaintext, len(key_string)):
+        for chunk in Op.get_chunks(plaintext, len(key_string)):
             xor_hex += Op.xor(binascii.hexlify(chunk), binascii.hexlify(key_string))
 
         return xor_hex
+
+    @staticmethod
+    def get_chunks(string, chunk_size):
+        return [ string[ i : i+chunk_size ] for i in range(0, len(string), chunk_size) ]
 
     """Calculate the Hamming distance between two strings"""
     @staticmethod

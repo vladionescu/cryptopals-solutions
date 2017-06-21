@@ -15,6 +15,11 @@ class Convert(object):
         return ['{0:08b}'.format(ord(char), 'b') for char in string]
 
 class Op(object):
+    """Sort a dict by the values instead of the keys"""
+    @staticmethod
+    def sort_dict_vals(unsorted_dict):
+        return sorted(unsorted_dict.items(), key=operator.itemgetter(1))
+
     @staticmethod
     def xor(hex1, hex2):
         bin1 = binascii.unhexlify(hex1)
@@ -141,9 +146,7 @@ class Op(object):
 
             possible_plaintexts.update({ xored_string : freq })
 
-        possible_plaintexts = sorted(possible_plaintexts.items(), key=operator.itemgetter(1))
-
-        return possible_plaintexts
+        return Op.sort_dict_vals(possible_plaintexts)
 
 if __name__ == "__main__":
     print "This is a module."

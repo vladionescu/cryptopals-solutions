@@ -25,19 +25,8 @@ def main():
             if verbose:
                 print "Encrypted string (hex): " + hex_string
                 print "Encrypted string (dec): " + " ".join([str(ord(a)) for a in binary])
-
-            '''
-                - run through 0-255 (possible keys), XORing the ciphertext with each value
-                - store the results in a dict along with each results' freq count
-            '''
-            for key in xrange(256):
-                xored_string = "".join([chr(ord(char) ^ key) for char in binary])
-                freq = score_string(xored_string)
-
-                if verbose:
-                    print "XORed with " + str(key) + ", ChiSquared " + str(freq) + ": " + xored_string
-
-                possible_plaintexts.update({ xored_string : freq })
+            
+            possible_plaintexts.update(try_xor_decryptions(binary))
 
     possible_plaintexts = sorted(possible_plaintexts.items(), key=operator.itemgetter(1))
 
@@ -47,9 +36,29 @@ def main():
 
     print "Best guess: " + possible_plaintexts[0][0]
 
-# https://crypto.stackexchange.com/questions/30209/developing-algorithm-for-detecting-plain-text-via-frequency-analysis
-# This assumes the plaintext is a clean English string
-def score_string(string):
+""" - run through 0-255 (possible keys), XORing the ciphertext with each value
+    - store the results in a dict along with each results' freq count
+"""
+def try_xor_decryptions(ciphertext_string):
+    possible_plaintexts = dict()
+    
+    for key in xrange(256):
+        xored_string = "".join([chr(ord(char) ^ key) for char in ciphertext_string])
+        freq = score_english_string(xored_string)
+
+        if verbose:
+            print "XORed with " + str(key) + ", ChiSquared " + str(freq) + ": " + xored_string
+
+        possible_plaintexts.update({ xored_string : freq })
+
+    possible_plaintexts = sorted(possible_plaintexts.items(), key=operator.itemgetter(1))
+
+    return possible_plaintexts
+
+""" https://crypto.stackexchange.com/questions/30209/developing-algorithm-for-detecting-plain-text-via-frequency-analysis
+    This assumes the plaintext is a clean English string
+"""
+def score_english_string(string):
     char_counts = [0] * 27
     counted_chars = 0
     str_length = 0

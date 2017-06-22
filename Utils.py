@@ -14,6 +14,17 @@ class Convert(object):
     def string_bytelist(string):
         return ['{0:08b}'.format(ord(char), 'b') for char in string]
 
+    """Takes a file containing ASCII armor: newline separated base64'd binary
+    data (the ciphertext). Returns the binary string."""
+    @staticmethod
+    def unascii_armor(filepath):
+	b64_string = ""
+	with open(filepath, 'r') as f:
+	    for line in f:
+		b64_string += line.strip()
+
+	return binascii.a2b_base64(b64_string)
+
 class Op(object):
     """Sort a dict by the values instead of the keys"""
     @staticmethod

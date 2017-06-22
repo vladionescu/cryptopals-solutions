@@ -1,20 +1,13 @@
 #!/usr/bin/env python
 import binascii
-from Utils import Op
+from Utils import Op, Convert
 from Crypto.Cipher import AES
 
 def main():
     key = "YELLOW SUBMARINE"
     IV = "\x00" * 16
 
-    """The file contains ASCII armor: newline separated base64'd binary data
-    (the ciphertext). Extract it work directly with the binary."""
-    b64_string = ""
-    with open('10.txt', 'r') as f:
-        for line in f:
-            b64_string += line.strip()
-
-    ciphertext = binascii.a2b_base64(b64_string)
+    ciphertext = Convert.unascii_armor('10.txt')
 
     """AES-ECB always has a 16 byte block size."""
     block_size = 16

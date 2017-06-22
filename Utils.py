@@ -150,5 +150,41 @@ class Op(object):
 
         return Op.sort_dict_vals(possible_plaintexts)
 
+    """Run through 0-255 (possible keys), XORing the ciphertext with each
+    value.
+    
+    Returns the results as a sorted list of Candidate objects with the most
+    likely result (lowest ChiSquared score, indicating it is most likely
+    English text) first."""
+    @staticmethod
+    def get_xor_candidates(ciphertext_string):
+        candidates = []
+        
+        for key in xrange(256):
+            candidate = Candidate()
+
+            xored_string = "".join([chr(ord(char) ^ key) for char in ciphertext_string])
+            freq = Op.score_english_string(xored_string)
+
+            candidate.original = ciphertext_string
+            candidate.result = xored_string
+            candidate.score = freq
+            candidate.key = key
+
+            candidates.append(candidate)
+
+        return Candidate.sort(candidates)
+
+class Candidate(object):
+    original = ""
+    result = ""
+    score = -0.0
+    key = -1
+
+    """Sort a list of Candidates by their score."""
+    @staticmethod
+    def sort(unsorted_list):
+        return sorted(unsorted_list, key=lambda x: x.score)
+
 if __name__ == "__main__":
     print "This is a module."

@@ -175,6 +175,35 @@ class Op(object):
 
         return Candidate.sort(candidates)
 
+    """PKCS#7 padding works by padding a block of input with the hexadecimal
+    number representing how many bytes of padding need to be added in order to
+    make the block complete.
+
+    Accepts either a string or a list of blocks (from Op.get_chunks() for
+    example).
+
+    Ex. For a block size of 8, padding 'testing' results in 'testing\x01'
+    because one byte was needed to make the block 8 bytes long. Padding 'test'
+    results in 'test\x04\x04\x04\x04' because four padding bytes were
+    needed."""
+    @staticmethod
+    def pkcs7(input_object, block_size):
+        if isinstance(input_object, basestring):
+            blocks = Op.get_chunks(input_object, block_size)
+        elif isinstance(input_object, list):
+            blocks = input_object
+        else:
+            """No proper error handling, that's a deep rabbit hole."""
+            return None
+        
+        """Last block is the only one that may not be the full block size."""
+        padding_size = block_size - len(blocks[-1])
+
+        if padding_size > 0:
+            blocks[-1] += chr(padding_size) * padding_size
+        
+        return blocks
+
 class Candidate(object):
     original = ""
     result = ""
@@ -188,3 +217,4 @@ class Candidate(object):
 
 if __name__ == "__main__":
     print "This is a module."
+

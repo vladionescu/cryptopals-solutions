@@ -215,6 +215,11 @@ class Op(object):
         
         return blocks
 
+    @staticmethod
+    def pkcs7_string(input_object, block_size):
+        blocks = Op.pkcs7(input_object, block_size)
+        return "".join(blocks)
+
 class Candidate(object):
     original = ""
     result = ""

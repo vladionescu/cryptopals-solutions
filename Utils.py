@@ -193,6 +193,8 @@ class Op(object):
     Accepts either a string or a list of blocks (from Op.get_chunks() for
     example).
 
+    Returns a list of binary blocks.
+
     Ex. For a block size of 8, padding 'testing' results in 'testing\x01'
     because one byte was needed to make the block 8 bytes long. Padding 'test'
     results in 'test\x04\x04\x04\x04' because four padding bytes were
@@ -215,10 +217,23 @@ class Op(object):
         
         return blocks
 
+    """Returns a string."""
     @staticmethod
     def pkcs7_string(input_object, block_size):
         blocks = Op.pkcs7(input_object, block_size)
         return "".join(blocks)
+
+    """Check whether there are any duplicate blocks in the ciphertext binary by
+    seeing if the number of unique blocks is the same as the number of total
+    blocks for that ciphertext."""
+    @staticmethod
+    def is_ecb_mode(binary, block_size=16):
+        blocks = Op.get_chunks(binary, block_size)
+
+        if len(set(blocks)) != len(blocks):
+            return True
+
+        return False
 
 class Candidate(object):
     original = ""

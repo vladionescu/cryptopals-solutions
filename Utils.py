@@ -18,10 +18,10 @@ class Convert(object):
     data (the ciphertext). Returns the binary string."""
     @staticmethod
     def unascii_armor(filepath):
-	b64_string = ""
-	with open(filepath, 'r') as f:
-	    for line in f:
-		b64_string += line.strip()
+        b64_string = ""
+        with open(filepath, 'r') as f:
+            for line in f:
+                b64_string += line.strip()
 
 	return binascii.a2b_base64(b64_string)
 
@@ -234,6 +234,34 @@ class Op(object):
             return True
 
         return False
+
+    """For every possible keysize, find the normalized Hamming distance between
+    all pairs of adjacent blocks of keysize length in the ciphertext. The
+    smallest disatnce is probably the real key length."""
+    @staticmethod
+    def guess_keysizes(ciphertext):
+	min_keysize = 2
+	max_keysize = 40
+	possible_keysizes = dict()
+	for keysize in xrange(min_keysize, max_keysize+1):
+	    total_blocks = len(ciphertext) // keysize
+
+	    avg_normalized_distance = 0.0
+
+	    for index in xrange(total_blocks):
+		block0 = ciphertext[index*keysize:(index*keysize)+keysize]
+		block1 = ciphertext[(index+1)*keysize:((index+1)*keysize)+keysize]
+
+		block_distance = Op.string_hamming_distance(block0, block1)
+		block_distance /= keysize
+
+		avg_normalized_distance += block_distance
+
+	    avg_normalized_distance /= total_blocks
+	    possible_keysizes.update({ keysize : avg_normalized_distance })
+
+	possible_keysizes = Op.sort_dict_vals(possible_keysizes)
+        return possible_keysizes
 
 class Candidate(object):
     original = ""

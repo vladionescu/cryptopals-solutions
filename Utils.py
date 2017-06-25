@@ -26,30 +26,32 @@ class Convert(object):
 	return binascii.a2b_base64(b64_string)
 
     """Accepts a string 'foo=bar&baz=qux' and returns an object
-    {'foo':'bar', 'baz':'qux'}."""
+    [['foo', 'bar'], ['baz', 'qux']]."""
     @staticmethod
     def str_obj(string):
-	obj = dict()
+	obj = []
 
 	items = string.split('&')
-	for item in items:
-	    obj.update([tuple(item.split('='))])
+        for item in items:
+            parts = item.split('=')
+	    obj.append([ parts[0], parts[1] ])
 
 	return obj
 
-    """Accepts an object {'foo':'bar', 'baz':'qux'} and returns a string
+    """Accepts an object [['foo', 'bar'], ['baz', 'qux']] and returns a string
     'foo=bar&baz=qux'."""
     @staticmethod
     def obj_str(objekt):
 	string = ""
 
 	first_pair = True
-	for k,v in objekt.iteritems():
+	#for k,v in objekt.iteritems():
+        for parts in objekt:
 	    if first_pair:
-		string += "{}={}".format(k,v)
+		string += "{}={}".format(parts[0], parts[1])
 		first_pair = False
 	    else:
-		string += "&{}={}".format(k,v)
+		string += "&{}={}".format(parts[0], parts[1])
 
 	return string
 

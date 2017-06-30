@@ -253,6 +253,44 @@ class Op(object):
         blocks = Op.pkcs7(input_object, block_size)
         return "".join(blocks)
 
+    """Remove PKCS#7 padding from a given list of blocks or a string.
+    If the input is PKCS#7 padded, return a list of unpadded blocks.
+    If no PKCS#7 padding is detected, return False."""
+    @staticmethod
+    def unpkcs7(input_object, block_size):
+        if isinstance(input_object, basestring):
+            blocks = Op.get_chunks(input_object, block_size)
+        elif isinstance(input_object, list):
+            blocks = input_object
+        else:
+            """No proper error handling, that's a deep rabbit hole."""
+            return None
+        
+        """Last block is the only one that will contain padding."""
+        padded_block = blocks[-1]
+
+        """Last byte of last block will be the padding value."""
+        padding_value = padded_block[-1]
+
+        """Remove the suspected padding bytes and verify they are PKCS#7
+        padding."""
+        padding = padded_block[-ord(padding_value):]
+
+        for char in padding:
+            if char != padding_value:
+                """If any bytes of the supposed padding is not the value of the
+                number of padded bytes, this is not PKCS#7."""
+                return False
+        
+        """Return the input blocks minus the padding in the last block."""
+        return blocks[:-1] + [ blocks[-1:][0][:-ord(padding_value)] ]
+
+    """Returns a string."""
+    @staticmethod
+    def unpkcs7_string(input_object, block_size):
+        blocks = Op.unpkcs7(input_object, block_size)
+        return "".join(blocks)
+
     """Check whether there are any duplicate blocks in the ciphertext binary by
     seeing if the number of unique blocks is the same as the number of total
     blocks for that ciphertext."""

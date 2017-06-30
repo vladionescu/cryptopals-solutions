@@ -255,7 +255,7 @@ class Op(object):
 
     """Remove PKCS#7 padding from a given list of blocks or a string.
     If the input is PKCS#7 padded, return a list of unpadded blocks.
-    If no PKCS#7 padding is detected, return False."""
+    If no PKCS#7 padding is detected, return the input unmodified."""
     @staticmethod
     def unpkcs7(input_object, block_size):
         if isinstance(input_object, basestring):
@@ -280,7 +280,7 @@ class Op(object):
             if char != padding_value:
                 """If any bytes of the supposed padding is not the value of the
                 number of padded bytes, this is not PKCS#7."""
-                return False
+                return blocks
         
         """Return the input blocks minus the padding in the last block."""
         return blocks[:-1] + [ blocks[-1:][0][:-ord(padding_value)] ]

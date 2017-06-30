@@ -34,7 +34,8 @@ class Convert(object):
 	items = string.split('&')
         for item in items:
             parts = item.split('=')
-	    obj.append([ parts[0], parts[1] ])
+            if len(parts) == 2:
+                obj.append([ parts[0], parts[1] ])
 
 	return obj
 
